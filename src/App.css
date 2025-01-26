@@ -1,20 +1,24 @@
+/* src/App.css */
 body {
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
+  background-color: #e9ecef; /* Light background color */
+  color: #333; /* General text color */
 }
 
 .navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #333;
+  background-color: #343a40; /* Dark navbar color */
   padding: 10px 20px;
   color: white;
   width: 100%;
   position: fixed;
   top: 0;
   z-index: 1000;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
 }
 
 .content-container {
@@ -76,7 +80,7 @@ body {
 }
 
 .dropdown-content a:hover {
-  background-color: #ddd;
+  background-color: #f8f9fa;
 }
 
 .dropdown:hover .dropdown-content {
@@ -90,18 +94,29 @@ body {
 }
 
 .search-bar input {
-  padding: 5px;
+  padding: 10px;
   border-radius: 3px 0 0 3px;
-  border: 1px solid #ccc;
+  border: 1px solid #ced4da;
+  transition: border-color 0.3s ease;
+}
+
+.search-bar input:focus {
+  border-color: #007bff;
+  outline: none;
 }
 
 .search-bar button {
-  padding: 5px 10px;
-  background-color: #666;
-  border: 1px solid #666;
+  padding: 10px 20px;
+  background-color: #007bff;
+  border: none;
   border-radius: 0 3px 3px 0;
   cursor: pointer;
   color: white;
+  transition: background-color 0.3s ease;
+}
+
+.search-bar button:hover {
+  background-color: #0056b3;
 }
 
 .navbar-right {
@@ -113,6 +128,32 @@ body {
   text-decoration: none;
   color: white;
   margin-right: 20px;
+}
+
+.filter-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.filter-container label {
+  margin-right: 10px;
+  font-size: 16px;
+  color: #333;
+}
+
+.filter-container select {
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  transition: border-color 0.3s ease;
+}
+
+.filter-container select:focus {
+  border-color: #007bff;
+  outline: none;
 }
 
 .grid {
@@ -127,6 +168,15 @@ body {
   padding: 10px;
   border-radius: 5px;
   text-align: center;
+  background: white;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.movie-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2); /* Elevated shadow on hover */
 }
 
 .movie-card img {
@@ -138,11 +188,12 @@ body {
 .movie-card h3 {
   font-size: 18px;
   margin: 10px 0;
+  color: #343a40; /* Title color */
 }
 
 .movie-card p {
   font-size: 14px;
-  color: #666;
+  color: #555; /* Description color */
 }
 
 .load-more-button {
@@ -153,6 +204,7 @@ body {
   border-radius: 5px;
   cursor: pointer;
   margin-top: 20px;
+  transition: background-color 0.3s ease;
 }
 
 .load-more-button:hover {
@@ -161,6 +213,7 @@ body {
 
 .read-the-docs {
   margin-top: 20px;
+  color: #333;
 }
 
 .no-results {
@@ -169,5 +222,5 @@ body {
   justify-content: center;
   height: calc(100vh - 70px);
   font-size: 24px;
-  color: #333;
+  color: #555;
 }
