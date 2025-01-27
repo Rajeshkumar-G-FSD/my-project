@@ -1,11 +1,9 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
-import axios from 'axios';
+import { fetchMovies } from './apiService';
 import SearchPage from './SearchPage';
 import MovieDetail from './MovieDetail';
 import './App.css';
-
-const API_URL = 'https://www.omdbapi.com/?apikey=361ae7fb';
 
 function App() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -14,21 +12,20 @@ function App() {
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
 
-  const fetchMovies = async (query, page = 1) => {
+  useEffect(() => {
+    // Fetch recent movies on initial load
+    fetchMoviesData('recent');
+  }, []);
+
+  const fetchMoviesData = async (query, page = 1) => {
     setIsLoading(true);
     setError(null); // Reset error state
     try {
-      const response = await axios.get(API_URL, {
-        params: {
-          s: `"${query}"`,
-          type: '',
-          page,
-        },
-      });
-      if (response.data.Error) {
-        setError(response.data.Error);
+      const data = await fetchMovies(query, '', page);
+      if (data.Error) {
+        setError(data.Error);
       } else {
-        setSearchResults(prevResults => [...prevResults, ...response.data.Search || []]);
+        setSearchResults((prevResults) => [...prevResults, ...data.Search || []]);
       }
     } catch (error) {
       setError('Failed to fetch movie data. Please try again later.');
@@ -45,21 +42,21 @@ function App() {
     if (e.key === 'Enter') {
       setSearchResults([]);
       setCurrentPage(1);
-      fetchMovies(searchQuery, 1);
+      fetchMoviesData(searchQuery, 1);
     }
   };
 
   const handleLoadMore = () => {
     const nextPage = currentPage + 1;
     setCurrentPage(nextPage);
-    fetchMovies(searchQuery, nextPage);
+    fetchMoviesData(searchQuery, nextPage);
   };
 
   return (
     <Router>
       <nav className="navbar">
         <div className="navbar-left">
-          <Link to="/" className="logo">OMDb</Link>
+          <Link to="/" className="logo">IMDb</Link>
           <div className="dropdown">
             <button className="dropbtn">All</button>
             <div className="dropdown-content">
@@ -68,20 +65,10 @@ function App() {
               <a href="#">Celebrities</a>
             </div>
           </div>
-          <div className="search-bar">
-            <input
-              type="text"
-              className="search-input"
-              placeholder="Search OMDb..."
-              value={searchQuery}
-              onChange={handleSearch}
-              onKeyPress={handleKeyPress}
-            />
-            <button className="search-button">🔍</button>
-          </div>
+         
         </div>
         <div className="navbar-right">
-          <a href="#" className="nav-link">OMDbPro</a>
+          <a href="#" className="nav-link">IMDbPro</a>
           <a href="#" className="nav-link">Watchlist</a>
           <a href="#" className="nav-link">Sign In</a>
           <div className="dropdown">
@@ -96,17 +83,20 @@ function App() {
       </nav>
       <div className="content-container">
         <Routes>
-          <Route exact path="/" element={
-            <SearchPage
-              searchQuery={searchQuery}
-              searchResults={searchResults}
-              handleSearch={handleSearch}
-              handleKeyPress={handleKeyPress}
-              handleLoadMore={handleLoadMore}
-              isLoading={isLoading}
-              error={error}
-            />
-          } />
+          <Route
+            path="/"
+            element={
+              <SearchPage
+                searchQuery={searchQuery}
+                searchResults={searchResults}
+                handleSearch={handleSearch}
+                handleKeyPress={handleKeyPress}
+                handleLoadMore={handleLoadMore}
+                isLoading={isLoading}
+                error={error}
+              />
+            }
+          />
           <Route path="/movie/:id" element={<MovieDetail />} />
         </Routes>
       </div>

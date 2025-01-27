@@ -7,6 +7,7 @@
     padding: 20px;
     min-height: calc(100vh - 70px); /* Adjust height to account for navbar */
     background-color: #e9ecef; /* Light background color */
+    margin-top: 10px;
   }
   
   .search-bar {

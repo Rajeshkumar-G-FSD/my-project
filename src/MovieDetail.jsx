@@ -1,10 +1,8 @@
 // src/MovieDetail.jsx
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom'; // Update import to useNavigate
-import axios from 'axios';
+import { fetchMovieDetails } from './apiService';
 import './MovieDetail.css';
-
-const API_URL = 'https://www.omdbapi.com/?apikey=361ae7fb';
 
 const MovieDetail = () => {
   const { id } = useParams();
@@ -14,19 +12,15 @@ const MovieDetail = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchMovieDetails = async () => {
+    const getMovieDetails = async () => {
       setIsLoading(true);
       setError(null); // Reset error state
       try {
-        const response = await axios.get(API_URL, {
-          params: {
-            i: id,
-          },
-        });
-        if (response.data.Error) {
-          setError(response.data.Error);
+        const data = await fetchMovieDetails(id);
+        if (data.Error) {
+          setError(data.Error);
         } else {
-          setMovie(response.data);
+          setMovie(data);
         }
       } catch (error) {
         setError('Failed to fetch movie details. Please try again later.');
@@ -35,7 +29,7 @@ const MovieDetail = () => {
       }
     };
 
-    fetchMovieDetails();
+    getMovieDetails();
   }, [id]);
 
   const handleBackClick = () => {
