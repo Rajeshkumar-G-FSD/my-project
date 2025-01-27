@@ -3,7 +3,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import './SearchPage.css';
 
-const SearchPage = ({ searchQuery, searchResults, handleSearch, handleKeyPress, handleLoadMore, isLoading, error }) => {
+const SearchPage = ({ searchQuery, searchResults, handleSearch, handleKeyPress, handleLoadMore, isLoading, error, selectedType, handleTypeChange }) => {
   return (
     <div className="search-page">
       <div className="search-bar">
@@ -17,11 +17,20 @@ const SearchPage = ({ searchQuery, searchResults, handleSearch, handleKeyPress, 
         />
         <button className="search-button">🔍</button>
       </div>
+      <div className="filter-container">
+        <label htmlFor="type">Filter by Type:</label>
+        <select id="type" value={selectedType} onChange={handleTypeChange}>
+          <option value="">All</option>
+          <option value="movie">Movie</option>
+          <option value="series">Series</option>
+          <option value="episode">Episode</option>
+        </select>
+      </div>
       {isLoading ? (
         <p>Loading...</p>
       ) : (
         <>
-          {error && <p>{error}</p>}
+          {error && <p className="error-message">{error}</p>}
           {searchResults.length > 0 ? (
             <>
               <div className="grid">

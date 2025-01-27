@@ -8,6 +8,7 @@ import './App.css';
 function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
+  const [selectedType, setSelectedType] = useState(''); // State for movie type filter
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
@@ -21,7 +22,7 @@ function App() {
     setIsLoading(true);
     setError(null); // Reset error state
     try {
-      const data = await fetchMovies(query, '', page);
+      const data = await fetchMovies(query, selectedType, page); // Include selectedType in the API call
       if (data.Error) {
         setError(data.Error);
       } else {
@@ -44,6 +45,13 @@ function App() {
       setCurrentPage(1);
       fetchMoviesData(searchQuery, 1);
     }
+  };
+
+  const handleTypeChange = (e) => {
+    setSelectedType(e.target.value);
+    setSearchResults([]);
+    setCurrentPage(1);
+    fetchMoviesData(searchQuery, 1);
   };
 
   const handleLoadMore = () => {
@@ -94,6 +102,8 @@ function App() {
                 handleLoadMore={handleLoadMore}
                 isLoading={isLoading}
                 error={error}
+                selectedType={selectedType}
+                handleTypeChange={handleTypeChange}
               />
             }
           />
