@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import axios from 'axios';
+import SearchPage from './SearchPage';
 import MovieDetail from './MovieDetail';
 import './App.css';
 
@@ -8,41 +10,28 @@ const API_URL = 'https://www.omdbapi.com/?apikey=361ae7fb';
 function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
-  const [selectedMovie, setSelectedMovie] = useState(null);
-  const [movieType, setMovieType] = useState(''); // State for movie type filter
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
 
-  const fetchMovies = async (query, type, page = 1) => {
+  const fetchMovies = async (query, page = 1) => {
     setIsLoading(true);
+    setError(null); // Reset error state
     try {
       const response = await axios.get(API_URL, {
         params: {
           s: `"${query}"`,
-          type,
+          type: '',
           page,
         },
       });
-      setSearchResults(prevResults => [...prevResults, ...response.data.Search || []]);
+      if (response.data.Error) {
+        setError(response.data.Error);
+      } else {
+        setSearchResults(prevResults => [...prevResults, ...response.data.Search || []]);
+      }
     } catch (error) {
-      setError('Failed to fetch movie data');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const fetchMovieDetails = async (id) => {
-    setIsLoading(true);
-    try {
-      const response = await axios.get(API_URL, {
-        params: {
-          i: id,
-        },
-      });
-      setSelectedMovie(response.data);
-    } catch (error) {
-      setError('Failed to fetch movie details');
+      setError('Failed to fetch movie data. Please try again later.');
     } finally {
       setIsLoading(false);
     }
@@ -56,36 +45,21 @@ function App() {
     if (e.key === 'Enter') {
       setSearchResults([]);
       setCurrentPage(1);
-      fetchMovies(searchQuery, movieType, 1);
+      fetchMovies(searchQuery, 1);
     }
   };
 
   const handleLoadMore = () => {
     const nextPage = currentPage + 1;
     setCurrentPage(nextPage);
-    fetchMovies(searchQuery, movieType, nextPage);
-  };
-
-  const handleMovieClick = (id) => {
-    fetchMovieDetails(id);
-  };
-
-  const handleBackClick = () => {
-    setSelectedMovie(null);
-  };
-
-  const handleTypeChange = (e) => {
-    setMovieType(e.target.value);
-    setSearchResults([]);
-    setCurrentPage(1);
-    fetchMovies(searchQuery, e.target.value, 1);
+    fetchMovies(searchQuery, nextPage);
   };
 
   return (
-    <>
+    <Router>
       <nav className="navbar">
         <div className="navbar-left">
-          <a href="#" className="logo">IMDb</a>
+          <Link to="/" className="logo">OMDb</Link>
           <div className="dropdown">
             <button className="dropbtn">All</button>
             <div className="dropdown-content">
@@ -98,7 +72,7 @@ function App() {
             <input
               type="text"
               className="search-input"
-              placeholder="Search IMDb..."
+              placeholder="Search OMDb..."
               value={searchQuery}
               onChange={handleSearch}
               onKeyPress={handleKeyPress}
@@ -107,7 +81,7 @@ function App() {
           </div>
         </div>
         <div className="navbar-right">
-          <a href="#" className="nav-link">IMDbPro</a>
+          <a href="#" className="nav-link">OMDbPro</a>
           <a href="#" className="nav-link">Watchlist</a>
           <a href="#" className="nav-link">Sign In</a>
           <div className="dropdown">
@@ -121,53 +95,22 @@ function App() {
         </div>
       </nav>
       <div className="content-container">
-        <div className="filter-container">
-          <label htmlFor="movie-type">Filter by Type:</label>
-          <select id="movie-type" value={movieType} onChange={handleTypeChange}>
-            <option value="">All</option>
-            <option value="movie">Movie</option>
-            <option value="series">Series</option>
-            <option value="episode">Episode</option>
-          </select>
-        </div>
-        {selectedMovie ? (
-          <MovieDetail movie={selectedMovie} onBack={handleBackClick} />
-        ) : (
-          <div className="search-results">
-            {isLoading ? (
-              <p>Loading...</p>
-            ) : (
-              <>
-                {error && <p>{error}</p>}
-                {searchResults.length > 0 ? (
-                  <>
-                    <div className="grid">
-                      {searchResults.map((movie) => (
-                        <div className="movie-card" key={movie.imdbID} onClick={() => handleMovieClick(movie.imdbID)}>
-                          <img src={movie.Poster} alt={movie.Title} />
-                          <h3>{movie.Title}</h3>
-                          <p>{movie.Year} - {movie.Type}</p>
-                        </div>
-                      ))}
-                    </div>
-                    <button className="load-more-button" onClick={handleLoadMore}>
-                      Load More
-                    </button>
-                  </>
-                ) : (
-                  <div className="no-results">
-                    <p>No results found</p>
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-        )}
-        <p className="read-the-docs">
-          Click on the Vite and React logos to learn more
-        </p>
+        <Routes>
+          <Route exact path="/" element={
+            <SearchPage
+              searchQuery={searchQuery}
+              searchResults={searchResults}
+              handleSearch={handleSearch}
+              handleKeyPress={handleKeyPress}
+              handleLoadMore={handleLoadMore}
+              isLoading={isLoading}
+              error={error}
+            />
+          } />
+          <Route path="/movie/:id" element={<MovieDetail />} />
+        </Routes>
       </div>
-    </>
+    </Router>
   );
 }
 
